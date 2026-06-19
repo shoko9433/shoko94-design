@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LP制作ヒアリングシート｜shoko94 Design</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Dancing+Script:wght@600&display=swap');
+:root {
+  --pink:#E8B4B8;--pink-light:#F9ECED;--pink-dark:#C4878C;
+  --bluegray:#8FA8B8;--bluegray-light:#EBF1F5;
+  --neutral:#C8B89A;--neutral-light:#F7F2EA;
+  --dark:#3A3228;--mid:#7A6E65;--soft:#A89890;--cream:#FDFAF6;--white:#FFFFFF;
+  --serif:'Noto Serif JP',serif;--sans:'Noto Sans JP',sans-serif;--script:'Dancing Script',cursive;
+  --shadow-sm:0 2px 16px rgba(58,50,40,0.07);--radius:16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--sans);background:var(--cream);color:var(--dark);min-height:100vh;line-height:1.75;}
+.header{background:linear-gradient(145deg,var(--pink-light),var(--neutral-light));padding:44px 24px 38px;text-align:center;position:relative;overflow:hidden;}
+.header::before{content:'shoko';font-family:var(--script);font-size:120px;color:var(--pink);opacity:0.08;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;white-space:nowrap;}
+.header-label{font-family:var(--script);font-size:14px;color:var(--pink-dark);margin-bottom:10px;position:relative;}
+.header h1{font-family:var(--serif);font-size:clamp(20px,5vw,26px);font-weight:700;color:var(--dark);margin-bottom:10px;position:relative;}
+.header-sub{font-size:13px;color:var(--mid);position:relative;max-width:400px;margin:0 auto;line-height:1.8;}
+.container{max-width:640px;margin:0 auto;padding:28px 20px 80px;}
+.intro-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:20px 22px;margin-bottom:28px;font-size:13px;color:var(--mid);line-height:1.9;}
+.intro-card strong{color:var(--dark);}
+.section{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-sm);margin-bottom:20px;overflow:hidden;}
+.section-head{padding:18px 22px 14px;border-bottom:1px solid #F5EFE8;display:flex;align-items:center;gap:12px;}
+.section-num{width:30px;height:30px;border-radius:50%;background:var(--pink-light);color:var(--pink-dark);font-family:var(--serif);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section-title{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--dark);}
+.section-desc{font-size:11px;color:var(--soft);margin-top:1px;}
+.q-block{padding:16px 22px;border-bottom:1px solid #F9F5F0;}
+.q-block:last-child{border-bottom:none;}
+.q-label{font-size:13px;font-weight:500;color:var(--dark);margin-bottom:8px;display:block;line-height:1.6;}
+.q-label .opt{font-size:11px;color:var(--soft);font-weight:400;}
+.q-hint{font-size:11px;color:var(--soft);margin-top:-4px;margin-bottom:8px;line-height:1.7;}
+.q-hint em{color:var(--pink-dark);font-style:normal;}
+input[type="text"],textarea{width:100%;border:1.5px solid #E5DED5;border-radius:10px;padding:10px 12px;font-family:var(--sans);font-size:14px;color:var(--dark);background:var(--cream);transition:border-color 0.2s;-webkit-appearance:none;}
+input[type="text"]:focus,textarea:focus{outline:none;border-color:var(--pink-dark);background:var(--white);}
+textarea{min-height:80px;resize:vertical;line-height:1.7;}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{border:1.5px solid #E5DED5;background:var(--white);border-radius:20px;padding:7px 15px;font-size:12px;color:var(--mid);cursor:pointer;transition:all 0.2s;user-select:none;}
+.chip:hover{border-color:var(--pink-dark);color:var(--pink-dark);}
+.chip.on{border-color:var(--pink-dark);background:var(--pink-light);color:var(--pink-dark);font-weight:700;}
+.submit-wrap{text-align:center;margin-top:32px;}
+.btn-submit{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--pink-dark),var(--neutral));color:var(--white);font-family:var(--serif);font-size:16px;font-weight:700;padding:17px 46px;border-radius:48px;border:none;cursor:pointer;box-shadow:0 6px 24px rgba(196,135,140,0.35);transition:transform 0.2s,box-shadow 0.2s;letter-spacing:0.04em;}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(196,135,140,0.45);}
+.submit-note{font-size:12px;color:var(--soft);margin-top:12px;line-height:1.7;}
+.copied-banner{display:none;background:var(--bluegray-light);color:var(--bluegray);border-radius:12px;padding:14px 18px;font-size:13px;margin-top:16px;text-align:center;line-height:1.7;font-weight:500;}
+.footer{text-align:center;padding:24px;font-size:11px;color:var(--soft);}
+.footer span{font-family:var(--script);color:var(--pink-dark);font-size:14px;}
+@media(max-width:480px){.q-block{padding:14px 18px;}.section-head{padding:16px 18px 12px;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <p class="header-label">shoko94 Design</p>
+  <h1>LP制作ヒアリングシート</h1>
+  <p class="header-sub">あなたのサービスの魅力を引き出すための質問です。<br>実績の有無は関係ありません。<br>わかる範囲で、思ったままに書いてください🌿</p>
+</div>
+
+<div class="container">
+
+  <div class="intro-card">
+    <strong>📝 ご記入にあたって</strong><br>
+    ・所要時間は10〜15分ほどです<br>
+    ・「まだわからない」「実績がない」もそのままでOKです<br>
+    ・<strong>うまくまとめなくていい。思ったことをそのまま書くほど、刺さるLPになります</strong><br>
+    ・最後の「回答をコピー」ボタンで、DMまたはLINEに貼り付けて送ってください
+  </div>
+
+  <!-- 1 基本情報 -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">1</div>
+      <div>
+        <div class="section-title">基本情報</div>
+        <div class="section-desc">あなたのことを教えてください</div>
+      </div>
+    </div>
+    <div class="q-block">
+      <label class="q-label">お名前・屋号</label>
+      <input type="text" id="q1" placeholder="例：山田はなこ／Hanako Kitchen">
+    </div>
+    <div class="q-block">
+      <label class="q-label">業種・お仕事の内容</label>
+      <input type="text" id="q2" placeholder="例：自宅でパン教室を主宰しています">
+    </div>
+    <div class="q-block">
+      <label class="q-label">SNSやサイトのURL <span class="opt">（あれば）</span></label>
+      <input type="text" id="q3" placeholder="例：Instagram @hanako_kitchen">
+    </div>
+  </div>
+
+  <!-- 2 LPの目的 -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">2</div>
+      <div>
+        <div class="section-title">LPの目的</div>
+        <div class="section-desc">今回のページで叶えたいこと</div>
+      </div>
+    </div>
+    <div class="q-block">
+      <label class="q-label">LPで紹介したいサービスは何ですか？</label>
+      <textarea id="q4" placeholder="例：初心者向けのパン作り体験レッスン（90分）"></textarea>
+    </div>
+    <div class="q-block">
+      <label class="q-label">価格 <span class="opt">（予定・検討中でもOK）</span></label>
+      <input type="text" id="q5" placeholder="例：3,500円／回　※まだ決めてない場合もそのまま">
+    </div>
+    <div class="q-block">
+      <label class="q-label">ページを見た人に、最終的にどうしてほしいですか？</label>
+      <div class="chip-row" id="goal-chips">
+        <span class="chip" data-v="申込み・予約をしてほしい">申込み・予約</span>
+        <span class="chip" data-v="公式LINEに登録してほしい">LINE登録</span>
+        <span class="chip" data-v="問い合わせ・相談をしてほしい">問い合わせ・相談</span>
+        <span class="chip" data-v="商品を購入してほしい">商品購入</span>
+        <span class="chip" data-v="その他">その他</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 届けたい相手 -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">3</div>
+      <div>
+        <div class="section-title">届けたい相手</div>
+        <div class="section-desc">一番大事なところです</div>
+      </div>
+    </div>
+    <div class="q-block">
+      <label class="q-label">どんな人に来てほしいですか？</label>
+      <p class="q-hint">年齢層・性別・状況など。<br>例：30〜40代の子育て中のママ。自宅時間が多い方</p>
+      <textarea id="q6"></textarea>
+    </div>
+    <div class="q-block">
+      <label class="q-label">その方は、どんなことに悩んでいると思いますか？</label>
+      <p class="q-hint">想像でOK。例：パン作りに挑戦したけど膨らまない。何が悪いのかわからない</p>
+      <textarea id="q7"></textarea>
+    </div>
+    <div class="q-block">
+      <label class="q-label">お客様や身近な方がよく口にする言葉はありますか？</label>
+      <p class="q-hint">実際に聞いた言葉をそのまま書いてください。コピーの材料になります。<br>例：「不器用でもできますか？」「初心者ですが大丈夫ですか？」<br><em>まだそういった声がない場合は、想像で書いてもOKです</em></p>
+      <textarea id="q8"></textarea>
+    </div>
+  </div>
+
+  <!-- 4 サービスの価値 -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">4</div>
+      <div>
+        <div class="section-title">サービスの価値</div>
+        <div class="section-desc">実績がなくても答えられます。想像でOK</div>
+      </div>
+    </div>
+    <div class="q-block">
+      <label class="q-label">あなたのサービスを受けた人は、どんな気持ちや変化を得られると思いますか？</label>
+      <p class="q-hint">実際のお客様の声があればそれも。なければ「こうなってほしい」でOK。<br>例：「私にもできた」という自信。家族に焼きたてパンを出せる喜び</p>
+      <textarea id="q9"></textarea>
+    </div>
+    <div class="q-block">
+      <label class="q-label">もしこのサービスがなかったら、その方はどうなっていると思いますか？</label>
+      <p class="q-hint">例：「向いてない」と諦めて、パン作り自体をやめていたかも<br><em>少し意地悪な問いですが、ここが「サービスの本当の価値」を言葉にするヒントになります</em></p>
+      <textarea id="q10"></textarea>
+    </div>
+    <div class="q-block">
+      <label class="q-label">同業の方と比べて、あなたが選ばれる（選ばれたい）理由は何だと思いますか？</label>
+      <p class="q-hint">小さなことでOK。実際に言われたことがあればそれも。<br>例：少人数制／質問しやすい雰囲気／失敗の原因を理論で説明できる</p>
+      <textarea id="q11"></textarea>
+    </div>
+    <div class="q-block">
+      <label class="q-label">あなたのサービスを受けてよかったと言ってくれた方はいますか？ <span class="opt">（家族・友人・モニターなど）</span></label>
+      <p class="q-hint">実績がまだない場合は「いない」でもOK。いる場合は、言ってくれた言葉をそのまま書いてください</p>
+      <textarea id="q12"></textarea>
+    </div>
+  </div>
+
+  <!-- 5 あなたの想い -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">5</div>
+      <div>
+        <div class="section-title">あなたの想い</div>
+        <div class="section-desc">ストーリーは信頼になります</div>
+      </div>
+    </div>
+    <div class="q-block">
+      <label class="q-label">なぜこのサービスを始めたのですか？</label>
+      <p class="q-hint">うまくまとまってなくて大丈夫。きっかけや原体験など、思ったままに</p>
+      <textarea id="q13"></textarea>
+    </div>
+    <div class="q-block">
+      <label class="q-label">このサービスで、一番大切にしていることは何ですか？</label>
+      <textarea id="q14"></textarea>
+    </div>
+    <div class="q-block">
+      <label class="q-label">お客様にどんな人だと思われたいですか？</label>
+      <p class="q-hint">例：「この人なら安心して任せられる」「一緒に考えてくれる人」<br><em>ここがブランドのトーンとコピーの方向性に直結します</em></p>
+      <textarea id="q15"></textarea>
+    </div>
+  </div>
+
+  <!-- 6 デザインの好み -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">6</div>
+      <div>
+        <div class="section-title">デザインの好み</div>
+        <div class="section-desc">なんとなく、で大丈夫です</div>
+      </div>
+    </div>
+    <div class="q-block">
+      <label class="q-label">ページの雰囲気、近いのはどれですか？ <span class="opt">（複数OK）</span></label>
+      <div class="chip-row" id="mood-chips">
+        <span class="chip" data-v="やわらかい・ナチュラル">やわらかい・ナチュラル</span>
+        <span class="chip" data-v="上品・きれいめ">上品・きれいめ</span>
+        <span class="chip" data-v="明るい・元気">明るい・元気</span>
+        <span class="chip" data-v="シンプル・洗練">シンプル・洗練</span>
+        <span class="chip" data-v="かわいい">かわいい</span>
+        <span class="chip" data-v="凛とした・かっこいい">凛とした・かっこいい</span>
+      </div>
+    </div>
+    <div class="q-block">
+      <label class="q-label">使いたい色・好きな色 <span class="opt">（あれば）</span></label>
+      <input type="text" id="q16" placeholder="例：ベージュ系、くすみピンク／ブランドカラーがあればそれも">
+    </div>
+    <div class="q-block">
+      <label class="q-label">「こんな感じ素敵だな」と思うページやアカウント <span class="opt">（あれば）</span></label>
+      <textarea id="q17" placeholder="URLやアカウント名を貼ってください"></textarea>
+    </div>
+    <div class="q-block">
+      <label class="q-label">逆に「これは避けたい」もの <span class="opt">（あれば）</span></label>
+      <input type="text" id="q18" placeholder="例：原色っぽい派手な色、ごちゃごちゃした感じ">
+    </div>
+  </div>
+
+  <!-- 7 素材・スケジュール -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">7</div>
+      <div>
+        <div class="section-title">素材・スケジュール</div>
+        <div class="section-desc">最後です、おつかれさまです🌿</div>
+      </div>
+    </div>
+    <div class="q-block">
+      <label class="q-label">お写真やロゴはお持ちですか？</label>
+      <div class="chip-row" id="photo-chips">
+        <span class="chip" data-v="写真もロゴもある">両方ある</span>
+        <span class="chip" data-v="写真はある">写真はある</span>
+        <span class="chip" data-v="ロゴはある">ロゴはある</span>
+        <span class="chip" data-v="どちらもない・相談したい">どちらもない・相談したい</span>
+      </div>
+    </div>
+    <div class="q-block">
+      <label class="q-label">いつ頃までに完成したいですか？</label>
+      <input type="text" id="q19" placeholder="例：来月の募集開始までに／特に急ぎません">
+    </div>
+    <div class="q-block">
+      <label class="q-label">不安なこと・聞いておきたいこと <span class="opt">（自由に）</span></label>
+      <textarea id="q20" placeholder="どんな小さなことでも大丈夫です"></textarea>
+    </div>
+  </div>
+
+  <div class="submit-wrap">
+    <button class="btn-submit" onclick="copyAnswers()">📋 回答をコピーする</button>
+    <p class="submit-note">コピーしたら、DMまたは公式LINEに<br>そのまま貼り付けて送ってください。</p>
+    <div class="copied-banner" id="copiedBanner">
+      ✓ コピーできました！<br>DMまたはLINEに貼り付けて送ってください🌸
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <span>shoko94 Design</span><br>伝わるデザイン、迷わせない導線。
+</div>
+
+<script>
+document.querySelectorAll('.chip-row').forEach(function(row) {
+  var multi = row.id === 'mood-chips';
+  row.querySelectorAll('.chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      if (multi) {
+        chip.classList.toggle('on');
+      } else {
+        row.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('on'); });
+        chip.classList.add('on');
+      }
+    });
+  });
+});
+
+function getChips(id) {
+  var sel = [];
+  document.querySelectorAll('#' + id + ' .chip.on').forEach(function(c) { sel.push(c.dataset.v); });
+  return sel.length ? sel.join('、') : '（未選択）';
+}
+
+function getVal(id) {
+  var el = document.getElementById(id);
+  return (el && el.value.trim()) ? el.value.trim() : '（未記入）';
+}
+
+function copyAnswers() {
+  var text = [
+    '【LP制作ヒアリングシート 回答】',
+    '',
+    '■ 基本情報',
+    'お名前・屋号：' + getVal('q1'),
+    '業種：' + getVal('q2'),
+    'SNS・サイト：' + getVal('q3'),
+    '',
+    '■ LPの目的',
+    '紹介したいサービス：' + getVal('q4'),
+    '価格：' + getVal('q5'),
+    'ゴール：' + getChips('goal-chips'),
+    '',
+    '■ 届けたい相手',
+    '来てほしい人：' + getVal('q6'),
+    'その人の悩み：' + getVal('q7'),
+    'よく口にする言葉：' + getVal('q8'),
+    '',
+    '■ サービスの価値',
+    '得られる気持ち・変化：' + getVal('q9'),
+    'サービスがなかったら：' + getVal('q10'),
+    '選ばれる（たい）理由：' + getVal('q11'),
+    '喜んでくれた言葉：' + getVal('q12'),
+    '',
+    '■ あなたの想い',
+    '始めたきっかけ：' + getVal('q13'),
+    '大切にしていること：' + getVal('q14'),
+    'どんな人だと思われたいか：' + getVal('q15'),
+    '',
+    '■ デザインの好み',
+    '雰囲気：' + getChips('mood-chips'),
+    '使いたい色：' + getVal('q16'),
+    '参考ページ：' + getVal('q17'),
+    '避けたいもの：' + getVal('q18'),
+    '',
+    '■ 素材・スケジュール',
+    '写真・ロゴ：' + getChips('photo-chips'),
+    '希望納期：' + getVal('q19'),
+    '不安なこと・質問：' + getVal('q20'),
+  ].join('\n');
+
+  function done() {
+    document.getElementById('copiedBanner').style.display = 'block';
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(function() { fallbackCopy(text); done(); });
+  } else {
+    fallbackCopy(text); done();
+  }
+}
+
+function fallbackCopy(text) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+}
+</script>
+</body>
+</html>

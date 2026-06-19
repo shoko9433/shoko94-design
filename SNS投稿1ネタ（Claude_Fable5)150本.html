@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投稿ネタ生成ツール｜shoko94 Design</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Dancing+Script:wght@600&display=swap');
+:root {
+  --pink:#E8B4B8;--pink-light:#F9ECED;--pink-dark:#C4878C;
+  --bluegray:#8FA8B8;--bluegray-light:#EBF1F5;
+  --neutral:#C8B89A;--neutral-light:#F7F2EA;
+  --dark:#3A3228;--mid:#7A6E65;--soft:#A89890;--cream:#FDFAF6;--white:#FFFFFF;
+  --serif:'Noto Serif JP',serif;--sans:'Noto Sans JP',sans-serif;--script:'Dancing Script',cursive;
+  --shadow-sm:0 2px 16px rgba(58,50,40,0.07);--shadow:0 4px 32px rgba(58,50,40,0.10);--radius:16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--sans);background:var(--cream);color:var(--dark);min-height:100vh;line-height:1.75;}
+.header{background:linear-gradient(145deg,var(--pink-light),var(--neutral-light));padding:40px 24px 36px;text-align:center;position:relative;overflow:hidden;}
+.header::before{content:'shoko';font-family:var(--script);font-size:120px;color:var(--pink);opacity:0.08;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;white-space:nowrap;}
+.header-label{font-family:var(--script);font-size:14px;color:var(--pink-dark);margin-bottom:10px;}
+.header h1{font-family:var(--serif);font-size:clamp(20px,5vw,28px);font-weight:700;color:var(--dark);margin-bottom:8px;position:relative;}
+.header-sub{font-size:13px;color:var(--mid);position:relative;}
+.container{max-width:640px;margin:0 auto;padding:32px 20px 80px;}
+.step-label{font-size:11px;letter-spacing:0.15em;color:var(--pink-dark);text-transform:uppercase;margin-bottom:10px;font-weight:500;}
+.step-title{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--dark);margin-bottom:16px;}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px;}
+.cat-btn{background:var(--white);border:2px solid #EDE6DE;border-radius:var(--radius);padding:18px 16px;cursor:pointer;text-align:left;transition:all 0.2s;box-shadow:var(--shadow-sm);}
+.cat-btn:hover{border-color:var(--pink-dark);background:var(--pink-light);transform:translateY(-1px);}
+.cat-btn.selected{border-color:var(--pink-dark);background:var(--pink-light);box-shadow:0 4px 20px rgba(196,135,140,0.20);}
+.cat-emoji{font-size:22px;margin-bottom:8px;display:block;}
+.cat-name{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--dark);margin-bottom:4px;}
+.cat-desc{font-size:11px;color:var(--mid);line-height:1.5;}
+.tone-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px;}
+.tone-btn{background:var(--white);border:1.5px solid #EDE6DE;border-radius:24px;padding:8px 18px;font-size:13px;color:var(--mid);cursor:pointer;transition:all 0.2s;}
+.tone-btn:hover{border-color:var(--bluegray);color:var(--bluegray);background:var(--bluegray-light);}
+.tone-btn.selected{border-color:var(--bluegray);background:var(--bluegray-light);color:var(--bluegray);font-weight:700;}
+.generate-wrap{text-align:center;margin-bottom:40px;}
+.btn-generate{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--pink-dark),var(--neutral));color:var(--white);font-family:var(--serif);font-size:16px;font-weight:700;padding:16px 44px;border-radius:48px;border:none;cursor:pointer;box-shadow:0 6px 24px rgba(196,135,140,0.35);transition:transform 0.2s,box-shadow 0.2s,opacity 0.2s;letter-spacing:0.04em;}
+.btn-generate:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 32px rgba(196,135,140,0.45);}
+.btn-generate:disabled{opacity:0.4;cursor:not-allowed;}
+.results{display:none;}
+.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.results-title{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--dark);}
+.btn-regenerate{background:transparent;border:1.5px solid var(--pink-dark);color:var(--pink-dark);font-size:12px;padding:6px 16px;border-radius:20px;cursor:pointer;transition:all 0.2s;}
+.btn-regenerate:hover{background:var(--pink-light);}
+.idea-list{display:flex;flex-direction:column;gap:14px;margin-bottom:28px;}
+.idea-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-sm);border:1px solid #EDE6DE;overflow:hidden;animation:fadeUp 0.4s ease forwards;opacity:0;}
+.idea-card:nth-child(2){animation-delay:0.08s;}
+.idea-card:nth-child(3){animation-delay:0.16s;}
+.idea-card:nth-child(4){animation-delay:0.24s;}
+.idea-card:nth-child(5){animation-delay:0.32s;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.idea-top{padding:18px 20px 14px;border-bottom:1px solid #F5EFE8;display:flex;gap:12px;align-items:flex-start;}
+.idea-num{width:26px;height:26px;border-radius:50%;background:var(--pink-light);color:var(--pink-dark);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.idea-hook{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--dark);line-height:1.55;}
+.idea-body{padding:14px 20px 16px;}
+.idea-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.idea-tag{font-size:11px;padding:3px 10px;border-radius:12px;font-weight:500;}
+.tag-purpose{background:var(--neutral-light);color:#7A6030;}
+.tag-format{background:var(--bluegray-light);color:var(--bluegray);}
+.idea-detail{font-size:13px;color:var(--mid);line-height:1.75;}
+.idea-actions{padding:12px 20px 14px;border-top:1px solid #F5EFE8;display:flex;gap:8px;}
+.btn-copy{background:transparent;border:1.5px solid #EDE6DE;color:var(--mid);font-size:12px;padding:6px 14px;border-radius:20px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:4px;}
+.btn-copy:hover{border-color:var(--pink-dark);color:var(--pink-dark);background:var(--pink-light);}
+.btn-copy.copied{border-color:#8FA8B8;color:#8FA8B8;background:var(--bluegray-light);}
+.tips-card{background:var(--neutral-light);border-radius:var(--radius);padding:20px 22px;margin-top:8px;}
+.tips-title{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--dark);margin-bottom:10px;}
+.tips-list{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.tips-list li{font-size:12px;color:var(--mid);display:flex;gap:8px;line-height:1.6;}
+.tips-list li::before{content:'✦';color:var(--neutral);flex-shrink:0;margin-top:1px;}
+@media(max-width:480px){.cat-grid{grid-template-columns:1fr 1fr;gap:8px;}.cat-btn{padding:14px 12px;}}
+</style>
+</head>
+<body>
+<div class="header">
+  <p class="header-label">shoko94 Design</p>
+  <h1>投稿ネタ生成ツール</h1>
+  <p class="header-sub">カテゴリーを選ぶだけで、刺さる投稿ネタが出てきます</p>
+</div>
+<div class="container">
+  <div style="margin-bottom:32px;">
+    <p class="step-label">Step 1</p>
+    <p class="step-title">今日発信したいカテゴリーを選んでください</p>
+    <div class="cat-grid">
+      <button class="cat-btn" data-cat="SNS集客の悩みあるある" onclick="selectCat(this)"><span class="cat-emoji">💭</span><div class="cat-name">SNS集客の悩み</div><div class="cat-desc">共感されてフォローされる</div></button>
+      <button class="cat-btn" data-cat="導線・申込みUP術" onclick="selectCat(this)"><span class="cat-emoji">🔗</span><div class="cat-name">導線・申込みUP術</div><div class="cat-desc">保存される専門家投稿</div></button>
+      <button class="cat-btn" data-cat="考え方の転換" onclick="selectCat(this)"><span class="cat-emoji">💡</span><div class="cat-name">考え方の転換</div><div class="cat-desc">シェアされる気づき投稿</div></button>
+      <button class="cat-btn" data-cat="制作の裏側" onclick="selectCat(this)"><span class="cat-emoji">🎨</span><div class="cat-name">制作の裏側</div><div class="cat-desc">依頼したくなる信頼投稿</div></button>
+    </div>
+  </div>
+  <div style="margin-bottom:32px;">
+    <p class="step-label">Step 2</p>
+    <p class="step-title">今日の投稿のトーンを選んでください</p>
+    <div class="tone-row">
+      <button class="tone-btn" data-tone="共感・寄り添い" onclick="selectTone(this)">共感・寄り添い</button>
+      <button class="tone-btn" data-tone="学び・Tips" onclick="selectTone(this)">学び・Tips</button>
+      <button class="tone-btn" data-tone="背中を押す" onclick="selectTone(this)">背中を押す</button>
+      <button class="tone-btn" data-tone="問いかけ" onclick="selectTone(this)">問いかけ</button>
+    </div>
+  </div>
+  <div class="generate-wrap">
+    <button class="btn-generate" id="generateBtn" onclick="generateIdeas()" disabled>✦ ネタを生成する</button>
+  </div>
+  <div class="results" id="results">
+    <div class="results-header">
+      <p class="results-title" id="resultsTitle">生成されたネタ</p>
+      <button class="btn-regenerate" onclick="generateIdeas()">もう一度生成</button>
+    </div>
+    <div class="idea-list" id="ideaList"></div>
+    <div class="tips-card">
+      <p class="tips-title">✦ 投稿するときのヒント</p>
+      <ul class="tips-list">
+        <li>1投稿1メッセージ。伝えたいことは1つに絞る</li>
+        <li>「あなたのお客様の言葉」をそのまま使うと刺さる（例：「毎日投稿してるのに…」）</li>
+        <li>職種を名指しすると自分ごと化される（例：料理教室・サロン・コーチの方へ）</li>
+        <li>最後は行動を促す一言（保存・プロフィールへ・DMなど）で締める</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<script>
+const IDEAS = {
+  "SNS集客の悩みあるある": {
+    "共感・寄り添い": [
+      { hook:"「毎日投稿してるのにフォロワー増えない」\nその努力、間違ってない。\nでも、止まってる場所がもったいない。", purpose:"フォロー獲得", format:"共感投稿", detail:"毎日投稿の努力を否定せず認めた上で、「投稿のあと、見た人がどこに行けばいいか」が用意されていないことが原因だと伝える。努力の方向を少し変えるだけ、という安心感で締める。" },
+      { hook:"公式LINE、作ったのに登録されない。\n料理教室・サロンの方、心当たりありませんか？", purpose:"フォロー獲得", format:"共感投稿", detail:"「登録してもらえる理由（特典・未来）」が伝わっていないことが原因。LINEを作っただけで満足してしまうあるあるに共感し、登録ページの見直しを促す。" },
+      { hook:"フォロワーはいるのに、申込みはゼロ。\n「私のサービス、需要ないのかな」って\n思っちゃいますよね。違います。", purpose:"フォロー獲得", format:"共感投稿", detail:"申込みが来ない＝需要がない、ではなく「フォロワーをお客様に変える道」がないだけ。自己否定に向かいがちな気持ちを止めて、導線の問題だと伝える。" },
+      { hook:"いいねは付く。コメントももらえる。\nなのに問い合わせは来ない。\nこの「あと一歩」の正体、話します。", purpose:"フォロー獲得", format:"共感投稿", detail:"反応はあるのに売上につながらない悩み。投稿→プロフィール→リンク先のどこかで迷子になっている。「投稿は悪くない」と伝えた上で導線チェックを促す。" },
+      { hook:"投稿する→反応ない→落ち込む→止まる。\nこのループ、私も入ってました。", purpose:"フォロー獲得", format:"共感投稿", detail:"しょうこさん自身の発信停止経験を正直に話す当事者投稿。「導線がないまま発信しても意味がないと気づいて、先に仕組みを整えることにした」という実体験で共感と信頼を同時に取る。" },
+      { hook:"「もう何を投稿すればいいか分からない」\n発信迷子の原因は、ネタ切れじゃないんです。", purpose:"フォロー獲得", format:"共感投稿", detail:"投稿のゴール（どこに連れて行きたいか）が決まっていないから何を書けばいいか分からなくなる。ゴールから逆算すればネタは自然に決まることを伝える。" },
+    ],
+    "学び・Tips": [
+      { hook:"フォロワーがお客様に変わらない理由、\n9割は「導線」にあります。", purpose:"保存", format:"Tips投稿", detail:"投稿→プロフィール→リンク先→申込みの4ステップを図解。どこで人が消えているかをチェックする方法を伝える。保存必須の構成にする。" },
+      { hook:"公式LINEが登録されない3つの理由\n（教室・サロン業の方向け）", purpose:"保存", format:"Tips投稿", detail:"①登録する理由（特典）がない②登録後の未来が見えない③登録までの道のりが分かりづらい。それぞれ改善例つきで解説。" },
+      { hook:"プロフィールまで来た人の多くは、\nリンクを押さずに帰ります。\n理由はたった1つ。", purpose:"保存", format:"Tips投稿", detail:"リンクの先に「何があるか」が書かれていないから。プロフィール文に「LINE登録で〇〇プレゼント」など、押す理由を明記する改善法を紹介。" },
+      { hook:"「集客できない」を分解すると、\n原因は3箇所しかない。", purpose:"保存", format:"Tips投稿", detail:"①見つけてもらえていない（投稿）②興味を持たれていない（プロフィール）③申込み方が分からない（リンク先）。自分がどこでつまずいているか診断できる投稿。" },
+      { hook:"インスタ集客、頑張る場所を\n間違えてる人が多すぎる。", purpose:"保存", format:"Tips投稿", detail:"投稿の質・量より先に「受け皿」（プロフィール・リンク先）を整えるべき理由。穴の空いたバケツに水を注ぐ例えで説明する。" },
+    ],
+    "背中を押す": [
+      { hook:"発信、止まってても大丈夫。\n再開に必要なのは気合いじゃなくて「仕組み」でした。", purpose:"フォロー獲得", format:"共感投稿", detail:"しょうこさん自身が2ヶ月発信を止めた経験から。導線を整えたら「発信する意味」が生まれて再開できた、という実体験ベースの応援投稿。" },
+      { hook:"フォロワー50人でも売れる人はいる。\n5000人いても売れない人もいる。\nあなたはどっちを目指しますか？", purpose:"フォロー獲得", format:"共感投稿", detail:"数より導線。少ないフォロワーでも「届く相手」と「受け皿」があれば売上は作れることを伝えて、数に消耗している人を楽にする。" },
+      { hook:"「SNS向いてないのかも」と思ったら、\n向き不向きの前に\n疑ってほしいことがあります。", purpose:"フォロー獲得", format:"共感投稿", detail:"性格や才能の問題ではなく、仕組み（導線）の問題である可能性を提示。「向いてない」と自分を責めるのをやめてもらう投稿。" },
+    ],
+    "問いかけ": [
+      { hook:"あなたの投稿を見た人、\n次にどこへ行けばいいか分かりますか？", purpose:"保存", format:"問いかけ投稿", detail:"投稿単体で完結していないか問いかける。プロフィール誘導・保存誘導・LINE誘導など「次の一歩」を必ず用意する重要性を伝える。" },
+      { hook:"もしフォロワーが今の半分になっても、\n売上を作れる自信、ありますか？", purpose:"フォロー獲得", format:"問いかけ投稿", detail:"フォロワー数に依存しない集客（導線・リスト・LP）の重要性に気づかせる問いかけ。ドキッとさせてから解決の方向性を示す。" },
+      { hook:"公式LINEに登録すると何がもらえるか、\n登録「前」に伝えていますか？", purpose:"保存", format:"問いかけ投稿", detail:"登録特典が登録後にしか分からないパターンが多い。投稿・プロフィール・登録ページの3箇所で特典を見せる改善法を紹介。" },
+    ],
+  },
+  "導線・申込みUP術": {
+    "共感・寄り添い": [
+      { hook:"「LPなんて自分には関係ない」と思ってた方へ。\n実は、公式LINEの登録ページも\n立派なLPなんです。", purpose:"保存", format:"Tips投稿", detail:"LP＝大層なもの、という思い込みを外す投稿。サービス案内ページ・予約ページ・登録ページ、全部LPであり、そこが整うと申込みが変わることを伝える。" },
+      { hook:"頑張って書いたサービス案内、\n最後まで読まれずに閉じられてたら\n悲しすぎませんか？", purpose:"フォロー獲得", format:"共感投稿", detail:"せっかく書いた文章が読まれていない現実に共感しつつ、「最初の3秒で読む価値が伝わるか」が分かれ目であることを伝える。" },
+      { hook:"「お申込みはDMで」って書いてるのに\nDMが来ない理由、わかりますか？", purpose:"保存", format:"Tips投稿", detail:"DMは心理的ハードルが高い。「何を書けばいいか分からない」から送れない。メニュー提示・テンプレ文の用意・予約フォームなど、ハードルを下げる方法を紹介。" },
+    ],
+    "学び・Tips": [
+      { hook:"公式LINEの登録率を上げたいなら、\n投稿より先に「登録ページ」を見直して。", purpose:"保存", format:"Tips投稿", detail:"登録ページに必要な3要素：①誰向けか②登録すると何がもらえるか③登録後どうなるか。この3つが3秒で伝わるかチェックする方法を解説。" },
+      { hook:"「お申込みはこちら」のボタン、\n今すぐ変えてほしい。", purpose:"保存", format:"Tips投稿", detail:"ボタンには「押した後に得られるもの」を書く。「無料で体験レッスンを予約する」「LINE登録で診断を受け取る」など、職種別の改善例を紹介。" },
+      { hook:"料金表の前に「お客様の声」。\n順番を変えるだけで、反応は変わります。", purpose:"保存", format:"Tips投稿", detail:"価格を見る前に「価値」を感じてもらう順番設計の話。共感→ベネフィット→信頼→価格→申込みの流れを図解で説明。" },
+      { hook:"あなたのサービス案内、\nスマホで見たことありますか？", purpose:"保存", format:"Tips投稿", detail:"見ている人の8〜9割はスマホ。PCで作ってPCで確認して終わりがち。スマホで見たときの文字サイズ・ボタンの押しやすさ・縦の流れをチェックする方法。" },
+      { hook:"実績ゼロでも「安心して申込める」は作れる。\n代わりになる3つのパーツ。", purpose:"保存", format:"Tips投稿", detail:"①顔と想いが見えるプロフィール②制作・準備過程の発信③申込み後の流れの明示。実績がない時期の信頼の作り方を、自身も実践中という立場で紹介。" },
+      { hook:"申込みボタンの「直前」に置くべき一文、\n知ってますか？", purpose:"保存", format:"Tips投稿", detail:"ボタンの直前には不安を消す一言（しつこい勧誘はしません・3分で完了します等）か背中を押す一言を。クッション文の具体例を職種別に紹介。" },
+    ],
+    "背中を押す": [
+      { hook:"立派なLPは要らない。\n必要なのは、1枚の「迷わせないページ」。", purpose:"フォロー獲得", format:"共感投稿", detail:"何十万円のLPを作る必要はなく、誰向け・何が得られる・どう申し込むかが整理された1枚があれば十分スタートできることを伝えてハードルを下げる。" },
+      { hook:"Canvaで作ったページでも、申込みは来ます。\n大事なのは見た目より「流れ」。", purpose:"フォロー獲得", format:"共感投稿", detail:"ツールの高級さではなく、読む人が迷わない流れ（共感→価値→信頼→行動）が大事。Canvaで十分戦えることを専門家として保証する投稿。" },
+    ],
+    "問いかけ": [
+      { hook:"プロフィールのリンク、押した先のページは\n「誰向けの何のページ」か\n3秒で分かりますか？", purpose:"保存", format:"問いかけ投稿", detail:"自分のリンク先を初見の目でチェックさせる問いかけ。3秒テストのやり方（家族や友人に見せて聞く）も紹介して行動を促す。" },
+      { hook:"申込みボタン、ページのどこにありますか？\n「一番下だけ」になってませんか？", purpose:"保存", format:"問いかけ投稿", detail:"最後まで読んだ人しか申し込めない設計のもったいなさを指摘。冒頭・中盤・最後の3箇所配置が基本であることを伝える。" },
+    ],
+  },
+  "考え方の転換": {
+    "共感・寄り添い": [
+      { hook:"「フォロワーを増やせば売れる」と思って\n消耗してました。\n順番、逆だったんです。", purpose:"シェア", format:"気づき投稿", detail:"先に受け皿（導線・ページ）を整えてから発信する方が、少ないフォロワーでも成果が出る。順番を変えるだけという気づきをシェアする投稿。" },
+      { hook:"集客できないのは、\nあなたのサービスが悪いからじゃない。\n「届け方」の問題です。", purpose:"シェア", format:"気づき投稿", detail:"サービスの質を疑って落ち込む人に、問題は中身ではなく伝え方・届け方にあることを伝える。サービスに自信を取り戻してもらう投稿。" },
+      { hook:"白状します。私も発信迷子になって、\n2ヶ月投稿が止まりました。", purpose:"フォロー獲得", format:"気づき投稿", detail:"デザイナーである自分も同じ悩みを持っていたことを正直に告白。「導線がないまま発信しても意味がない」と気づいて立て直した過程を語る、最強の当事者投稿。" },
+    ],
+    "学び・Tips": [
+      { hook:"SNSは「売る場所」じゃなくて「出会う場所」。\n売るのは、その先のページの仕事です。", purpose:"シェア", format:"気づき投稿", detail:"投稿で売ろうとするから疲れるし売れない。SNSの役割は知ってもらうこと、売るのはLP・登録ページの役割、という分業の考え方を伝える。" },
+      { hook:"フォロワー数 × 導線 ＝ 売上。\n掛け算だから、導線がゼロなら売上もゼロ。", purpose:"シェア", format:"気づき投稿", detail:"フォロワーをいくら増やしても導線が0なら売上は0という掛け算の概念。逆に導線があれば少ないフォロワーでも売上が立つことを数式で分かりやすく伝える。" },
+      { hook:"毎日投稿より、週2投稿＋整った導線。\n労力は半分、成果は上がる。", purpose:"シェア", format:"気づき投稿", detail:"投稿頻度を上げる前に導線を整える方が費用対効果が高い理由。疲弊している人に「減らしていい」という許可を出す投稿。" },
+      { hook:"「バズる投稿」と「申込みが入る投稿」は\n別のスキルです。\nあなたに必要なのはどっち？", purpose:"シェア", format:"気づき投稿", detail:"バズ＝売上ではない。リーチより「刺さる深さ」と「導線」が申込みには重要。小さくても売れるアカウントの考え方を伝える。" },
+    ],
+    "背中を押す": [
+      { hook:"発信が止まっても、ビジネスは終わりません。\n導線を整えてから再開すればいい。\n私がそうでした。", purpose:"フォロー獲得", format:"気づき投稿", detail:"発信停止に罪悪感を持つ人への許しの投稿。止まった期間に仕組みを整えれば、再開後の発信が全部意味を持つようになることを実体験で伝える。" },
+      { hook:"「今さら始めても遅い」は、SNSにはないです。\n仕組みを整えた人から、結果が出ます。", purpose:"フォロー獲得", format:"気づき投稿", detail:"後発でも導線設計がしっかりしていれば追い抜ける。フォロワー数の差は導線の質で逆転できることを伝える応援投稿。" },
+    ],
+    "問いかけ": [
+      { hook:"あなたが今ほしいのは「フォロワー」ですか？\nそれとも「お客様」ですか？", purpose:"シェア", format:"問いかけ投稿", detail:"目的の再確認を促す問いかけ。フォロワー集めが目的化していないか立ち止まらせ、お客様を増やすために必要なものは何かを考えさせる。" },
+      { hook:"「フォロワーが増えたら売れる」って、\n本当でしょうか？\n一度、疑ってみてほしい。", purpose:"シェア", format:"問いかけ投稿", detail:"多くの人が信じている前提を問い直す投稿。フォロワー数と売上が比例しない実例を挙げて、導線の重要性に気づかせる。" },
+    ],
+  },
+  "制作の裏側": {
+    "共感・寄り添い": [
+      { hook:"LP制作のご相談で一番多いのは\n「何を載せればいいか分からない」。\n大丈夫、それが普通です。", purpose:"信頼構築", format:"制作裏側投稿", detail:"何を載せるかはヒアリングで一緒に整理するもの。「分からないまま相談していい」というハードル下げと、整理のプロセス（誰に・何を・どこへ）を見せる投稿。" },
+      { hook:"「デザインはお任せします」と言われたとき、\n私が最初にする質問があります。", purpose:"信頼構築", format:"制作裏側投稿", detail:"「誰に届けたいですか？」から始める理由を語る。デザインの前にターゲットと目的を整理するのがshoko94流であることを見せて、設計力をアピール。" },
+    ],
+    "学び・Tips": [
+      { hook:"企業でLPを8年作って分かったこと。\nきれいなデザインと、売れるデザインは違う。", purpose:"信頼構築", format:"制作裏側投稿", detail:"美しさは手段であって目的ではない。「伝わる速さ」「迷わない流れ」が成果を作る。実務経験に基づく専門性を見せる投稿。" },
+      { hook:"私がLPを作るとき、\nデザインに入る前に決めること3つ。", purpose:"信頼構築", format:"制作裏側投稿", detail:"①誰に（ターゲット）②何を伝えて（ベネフィット）③どこへ連れて行くか（CTA）。この設計図が先、デザインは後。制作プロセスの透明化で信頼を作る。" },
+      { hook:"昔、作ったバナーがたくさん拡散されたとき\n気づいたんです。\nデザインの良さ＝「伝わる速さ」だって。", purpose:"信頼構築", format:"制作裏側投稿", detail:"企業時代のバナーがリポスト・いいねを多く獲得した実体験から。一瞬で伝わるデザインが反応を生む、という自身の原点エピソードで実績と哲学を同時に見せる。" },
+      { hook:"Canvaでも「売れるページ」は作れます。\nカギはテンプレ選びじゃありません。", purpose:"保存", format:"Tips投稿", detail:"テンプレの見た目より、構成（共感→価値→信頼→行動）と言葉が9割。Canvaで設計を意識する具体的なポイントを専門家視点で紹介。" },
+    ],
+    "背中を押す": [
+      { hook:"「相談するほどじゃないかも」\nその遠慮、要らないです。", purpose:"信頼構築", format:"制作裏側投稿", detail:"小さな違和感の段階で相談してもらった方が解決が早い。「導線のモヤモヤ整理だけでも歓迎」というスタンスを見せて相談のハードルを下げる。" },
+      { hook:"デザイナーに頼む前に、\nこの3つだけ整理しておくとスムーズです。", purpose:"保存", format:"Tips投稿", detail:"①誰向けのサービスか②お客様がよく言う言葉③ゴール（LINE登録？申込み？）。依頼準備のTipsを教えることで、誠実さと専門性を同時に見せる。" },
+    ],
+    "問いかけ": [
+      { hook:"デザイナー選び、\n「絵が上手い人」を選んでいませんか？", purpose:"信頼構築", format:"問いかけ投稿", detail:"集客目的なら「設計ができる人」を選ぶべき。マーケティング理解のあるデザイナーの見分け方を伝えつつ、自分の強みにつなげる。" },
+      { hook:"そのサービス案内ページ、\n「誰が・どこで・どんな気持ちで」読む想定で\n作りましたか？", purpose:"信頼構築", format:"問いかけ投稿", detail:"寝る前にスマホで見る30代女性と、PCでじっくり比較する人では作り方が違う。読者の状況を想定する設計視点を見せる投稿。" },
+    ],
+  },
+};
+
+const EXTRA_IDEAS = {
+  "SNS集客の悩みあるある": {
+    "共感・寄り添い": [
+      { hook:"リールがバズったのに、売上はゼロ。\n再生数と申込みは、別の話なんです。", purpose:"フォロー獲得", format:"共感投稿", detail:"バズ＝集客成功ではないことに共感。見に来た人を受け止める導線がないと再生数は数字で終わる。バズの後にやるべき準備に触れる。" },
+      { hook:"ストーリーズ、見てくれてる人はいるのに\n反応がない。\n…見てる人、ちゃんといますよ。", purpose:"フォロー獲得", format:"共感投稿", detail:"閲覧数はあるのにスタンプも返信もない孤独感に共感。サイレントで見ている人こそ見込み客であること、声をかけるきっかけ（質問スタンプ等）の作り方に触れる。" },
+      { hook:"気づいたら、フォロワーさんがほぼ同業者。\n交流は楽しい。けど、お客様がいない。", purpose:"フォロー獲得", format:"共感投稿", detail:"同業フォロワーばかり増えるあるある。交流を否定せず、「お客様に見つけてもらう発信」と「仲間との交流」は別物だと整理してあげる。" },
+      { hook:"値段を聞かれて、返事したら消えた。\nあの沈黙、つらいですよね。", purpose:"フォロー獲得", format:"共感投稿", detail:"価格を伝えた途端に既読スルーされる痛みに共感。原因は価格そのものではなく、価格の前に価値が伝わっていないこと。順番の問題だと伝える。" },
+      { hook:"無料モニターには来るのに、\n本命サービスは売れない。", purpose:"フォロー獲得", format:"共感投稿", detail:"無料と有料の間にある見えない壁。無料の時点で「その先の未来」を見せられていないことが原因。モニター設計の見直しポイントに触れる。" },
+      { hook:"1投稿に2時間。\n投稿に時間をかけすぎて、本業が進まない。", purpose:"フォロー獲得", format:"共感投稿", detail:"投稿作成に疲弊しているあるある。完璧な投稿より「導線につながる投稿」を短時間で作る方が成果が出ることを伝えて楽にする。" },
+      { hook:"ハイライト、きれいに整えたのに\n誰も見てない…。", purpose:"フォロー獲得", format:"共感投稿", detail:"ハイライトの表紙と並び順がもったいないことになっているあるある。最初の2つに「初めての方へ」「メニュー」を置くなどの改善に触れる。" },
+      { hook:"プロフィール、何度も書き直してるのに\nしっくりこない。", purpose:"フォロー獲得", format:"共感投稿", detail:"書き方の問題ではなく「誰に何を届けるか」が決まっていないことが原因。決めてから書くと一発で決まることを伝える。" },
+      { hook:"同業のあの人と比べて、落ち込む夜。\nありますよね。", purpose:"フォロー獲得", format:"共感投稿", detail:"キラキラした同業者と比べてしまう気持ちに共感。比べるべきは他人ではなく「先月の自分の導線」。見るべき場所を変えてあげる投稿。" },
+      { hook:"DMで売り込むのは苦手。\nでも、待ってるだけじゃ来ない。\nこのジレンマ、抜け道があります。", purpose:"フォロー獲得", format:"共感投稿", detail:"push型営業への苦手意識に共感しつつ、導線が整っていれば「待つ」が戦略になることを伝える。売り込まない集客の入り口投稿。" },
+    ],
+    "学び・Tips": [
+      { hook:"伸びる投稿のヒントは、\n「いいね」じゃなくて「保存数」にあります。", purpose:"保存", format:"Tips投稿", detail:"保存が多い投稿＝お客様があとで見返したい価値ある情報。インサイトで保存数を確認して、その系統を増やす分析法を紹介。" },
+      { hook:"プロフィールは「実績の場」じゃなくて\n「案内板」です。", purpose:"保存", format:"Tips投稿", detail:"①誰向けか②何が得られるか③次にどこへ行けばいいか。この3つが3秒で分かるプロフィール構成のテンプレを紹介。" },
+      { hook:"ストーリーズ、「日常」より\n「お客様の質問への回答」を流してみて。", purpose:"保存", format:"Tips投稿", detail:"日常投稿は親近感、質問回答は信頼を作る。よくある質問に答えるだけでネタ切れせず専門性も伝わる使い方を紹介。" },
+      { hook:"フォロワーを増やす前に、\n「増えたあとの受け皿」を。\nザルに水、注いでませんか？", purpose:"保存", format:"Tips投稿", detail:"リンク先・プロフィール・特典が整っていない状態でフォロワーを増やしても流出するだけ。受け皿→集客の順番を図解で伝える。" },
+      { hook:"リールでバズっても売れないのは、\n見に来た人が「ファンになる前に」帰るから。", purpose:"保存", format:"Tips投稿", detail:"バズ前に整えるべき3つ：プロフィール・固定投稿・リンク先。バズは準備した人だけが収穫できることを伝える。" },
+      { hook:"投稿の最後の1行、\n何て書いてますか？", purpose:"保存", format:"Tips投稿", detail:"「保存してね」「プロフィールのリンクへ」など行き先を1つ書くだけで行動率が変わる。CTAの書き方パターンを職種別に紹介。" },
+      { hook:"「いいね回り」しなくても\n見つけてもらう方法、あります。", purpose:"保存", format:"Tips投稿", detail:"お客様が検索しそうな言葉（例：パン教室 初心者 ○○市）を投稿文やプロフィールに入れる検索対策。消耗しない発見のされ方を紹介。" },
+      { hook:"教室・サロン業の方、\n投稿ネタは「お客様の質問」の中にあります。", purpose:"保存", format:"Tips投稿", detail:"レッスンや施術中に聞かれた質問をメモ→そのまま投稿ネタに。1つの質問は他の100人も思っていること。ネタ帳の作り方を紹介。" },
+      { hook:"投稿の「時間帯」、ターゲットに合わせてますか？\n30〜50代女性なら、夜21時台が狙い目。", purpose:"保存", format:"Tips投稿", detail:"家事や仕事がひと段落してスマホを見る時間帯を狙う。自分のインサイトでフォロワーのアクティブ時間を確認する方法も紹介。" },
+    ],
+    "背中を押す": [
+      { hook:"投稿が苦手でも大丈夫。\n上手な文章より「正直な言葉」の方が、選ばれます。", purpose:"フォロー獲得", format:"共感投稿", detail:"うまく書こうとして止まる人へ。きれいな文章より、お客様の悩みを分かっている言葉の方が刺さることを伝えて投稿のハードルを下げる。" },
+      { hook:"「今日も投稿できなかった」って\n責めないでください。", purpose:"フォロー獲得", format:"共感投稿", detail:"投稿が止まった日も、整えた導線は24時間働いてくれる。それが仕組みの良さ。罪悪感から解放する投稿。" },
+      { hook:"完璧なアカウント設計、なくていい。\nプロフィール・リンク先・投稿3本。\nそれだけで始められます。", purpose:"フォロー獲得", format:"共感投稿", detail:"準備しすぎて始められない人へ。最小限の3点セットで走り出して、あとから整える方が早いことを伝える。" },
+      { hook:"フォロワー100人は「少ない」じゃない。\n100人の前で話せるって、すごいことです。", purpose:"フォロー獲得", format:"共感投稿", detail:"数字の捉え方を変える投稿。リアルで100人集めるのは大変なこと。今いる100人を大切にする発信が結局一番伸びる。" },
+      { hook:"発信を休むのは「逃げ」じゃなくて\n「立て直し」。\n私も2ヶ月止まって、今こうして戻ってます。", purpose:"フォロー獲得", format:"共感投稿", detail:"しょうこさん自身の発信停止と再開の実体験。休んでいた間に導線を整えたことで、戻ってきた今は発信に意味がある状態になったと語る当事者投稿。" },
+    ],
+    "問いかけ": [
+      { hook:"あなたのアカウント、初めて見た人は\n「何の人」か3秒で分かりますか？", purpose:"保存", format:"問いかけ投稿", detail:"アイコン・名前・プロフィール1行目の3点チェックを促す。「○○市のパン教室」など名前に入れるだけで変わることを紹介。" },
+      { hook:"最近の投稿5本、\nぜんぶ「お知らせ」になってませんか？", purpose:"フォロー獲得", format:"問いかけ投稿", detail:"告知ばかりのアカウントはフォローする理由がない。お役立ち・共感・告知のバランス（目安は3:1）を伝える。" },
+      { hook:"お客様は、あなたの投稿の「どこ」で\n申し込むか決めてると思いますか？", purpose:"保存", format:"問いかけ投稿", detail:"実は投稿そのものより、プロフィールとリンク先で決めている。投稿は入口にすぎないことに気づかせて導線の重要性につなげる。" },
+      { hook:"「集客のための投稿」と\n「いいねのための投稿」、\nどっちを作ってますか？", purpose:"シェア", format:"問いかけ投稿", detail:"いいねが多い投稿と申込みにつながる投稿は別物。目的から逆算した投稿づくりの視点を渡す。" },
+      { hook:"もしインスタが明日消えたら、\nお客様とつながる手段、ありますか？", purpose:"保存", format:"問いかけ投稿", detail:"SNSだけに依存するリスクに気づかせ、公式LINEなど「自分のリスト」を持つ重要性を伝える。リスト取りの第一歩を紹介。" },
+    ],
+  },
+  "導線・申込みUP術": {
+    "共感・寄り添い": [
+      { hook:"「ご予約はDMで」が、実は一番\nハードル高いって知ってました？", purpose:"保存", format:"Tips投稿", detail:"お客様は「なんて送ればいいか」が分からなくて止まっている。コピペで送れるテンプレ文を用意するだけでDMは増えることを紹介。" },
+      { hook:"リンクまとめページ、\n「作っただけ」になってませんか？", purpose:"保存", format:"共感投稿", detail:"リンクが並んでいるだけで「どれを押せばいいか」が分からない状態。選択肢が多いほど人は選べなくなる心理を伝えて、整理を促す。" },
+      { hook:"メニュー表、お品書きみたいに\nなってませんか？", purpose:"保存", format:"共感投稿", detail:"メニュー名と価格の羅列では「どれが私向け？」が分からない。各メニューに「こんな方に」の1行を添えるだけで選びやすくなることを伝える。" },
+      { hook:"申込みフォーム、項目多すぎ問題。\n10項目あったら、もう帰ってます。", purpose:"保存", format:"Tips投稿", detail:"入力項目が多いほど離脱率が上がる。必須は5項目まで、それ以外は会ってから聞けばいい、という整理術を伝える。" },
+      { hook:"「料金はDMでお問い合わせください」\nそれだけで、何人も帰ってます。", purpose:"保存", format:"共感投稿", detail:"価格非公開は「高そう」「面倒」と思われて離脱の原因に。せめて目安や「○○円〜」だけでも載せる勇気が申込みを増やすことを伝える。" },
+      { hook:"インスタ→LINE→LP→フォーム。\n経由地が多いほど、人は減っていきます。", purpose:"保存", format:"Tips投稿", detail:"1画面遷移するたびに人は離脱する。本当に必要な経由地だけに絞る導線のダイエット法を紹介。" },
+      { hook:"「とりあえずリットリンク」、\n一度見直してみませんか。", purpose:"保存", format:"共感投稿", detail:"リンク集は便利だが「全部見せる」は「何も選ばれない」と同じ。今いちばん来てほしい場所1つに絞る考え方を伝える。" },
+      { hook:"お客様の声、スクショ貼っただけに\nなってませんか？", purpose:"保存", format:"Tips投稿", detail:"スクショだけでは読み飛ばされる。「どんな悩みの人が→どう変わったか」の要約を添える見せ方で、声が武器になることを伝える。" },
+    ],
+    "学び・Tips": [
+      { hook:"導線は「3タップ以内」が基本です。\n投稿→プロフィール→申込み。", purpose:"保存", format:"Tips投稿", detail:"タップ数が増えるごとに離脱する。自分のアカウントで申込みまで何タップか数えて、減らす方法を具体的に紹介。" },
+      { hook:"LINE登録特典、「クーポン」より\n「悩み解決系」が刺さります。", purpose:"保存", format:"Tips投稿", detail:"割引は既に買う気の人にしか効かない。パン教室なら「失敗しない発酵チェックリスト」など、悩み解決特典の方が登録率が上がる。職種別の特典例を紹介。" },
+      { hook:"申込みページの一番上に置くべきは、\n実績じゃなくて「誰のためのページか」。", purpose:"保存", format:"Tips投稿", detail:"実績から始まるページは自分語りに見える。まず「あなた向けです」と伝えてから実績で裏付ける順番の話。" },
+      { hook:"「今すぐ客」と「そのうち客」、\n導線は分けて作る。", purpose:"保存", format:"Tips投稿", detail:"今すぐ申し込みたい人→申込みページへ直行、迷っている人→LINE登録で育てる。2つの出口を用意する設計を図解で紹介。" },
+      { hook:"CTAボタンの色、\nページの中で「1色」に統一してますか？", purpose:"保存", format:"Tips投稿", detail:"押してほしいボタンだけ目立つ色に統一すると、無意識に「これを押せばいい」と伝わる。色設計の基本を紹介。" },
+      { hook:"申込み完了後の「ありがとうページ」、\n実は隠れた一等地です。", purpose:"保存", format:"Tips投稿", detail:"申込み直後は一番熱量が高い瞬間。LINE登録案内・SNSフォロー・関連サービスの案内を置ける活用法を紹介。" },
+      { hook:"教室・サロンの予約は\n「空き状況が見える」だけで変わります。", purpose:"保存", format:"Tips投稿", detail:"「予約できるか分からない」が問い合わせのハードルに。空き枠をストーリーズやハイライトで見せるだけで予約率が上がる方法を紹介。" },
+      { hook:"フォームの項目は5つまで。\n名前・連絡先・希望日・きっかけ・質問。", purpose:"保存", format:"Tips投稿", detail:"それ以外の情報は会ってから聞けばいい。項目を減らした分だけ申込みは増える。削る基準を具体的に紹介。" },
+    ],
+    "背中を押す": [
+      { hook:"導線づくりは、1日でできます。\n完璧じゃなくていい。\n「つながってる」ことが大事。", purpose:"フォロー獲得", format:"共感投稿", detail:"大ごとに考えて後回しにしている人へ。投稿→プロフィール→リンク先が繋がっているかの確認だけなら今日できることを伝える。" },
+      { hook:"高いツールは要りません。\nインスタ＋公式LINE＋Canva。\n無料で導線は完成します。", purpose:"フォロー獲得", format:"共感投稿", detail:"お金をかけないと集客できないという思い込みを外す。無料ツールの組み合わせで十分な導線が作れる構成例を紹介。" },
+      { hook:"「導線なんて、私にはまだ早い」\n…逆です。\n売れるために作るものです。", purpose:"フォロー獲得", format:"共感投稿", detail:"売れてから整えるのではなく、整えるから売れる。順番の誤解を解いて、今日から始める後押しをする。" },
+      { hook:"導線を整えるのに、\nフォロワー数は関係ありません。", purpose:"フォロー獲得", format:"共感投稿", detail:"フォロワーが少ない今こそ整えどき。少ない流入を確実に受け止められる状態を作ってから増やす方が効率的だと伝える。" },
+      { hook:"1人目のお客様は、立派な仕組みじゃなく\n「分かりやすい一本道」から来ます。", purpose:"フォロー獲得", format:"共感投稿", detail:"ステップ配信や自動化はまだ要らない。誰向け・何が得られる・どう申し込む、の一本道があれば最初のお客様は来ることを伝える。" },
+    ],
+    "問いかけ": [
+      { hook:"あなたのお客様、申込みまでに\n何回タップしてますか？", purpose:"保存", format:"問いかけ投稿", detail:"自分で投稿から申込みまで実際にたどってタップ数を数えるチェックを促す。3タップ超えていたら削る場所を探す。" },
+      { hook:"プロフィールのリンク、\n最後に確認したのはいつですか？", purpose:"保存", format:"問いかけ投稿", detail:"リンク切れ・古いキャンペーンページのまま、が意外と多い。月1のリンクチェック習慣を提案する。" },
+      { hook:"「申込みたい」と思った瞬間のお客様、\nその熱が冷める前に申込めますか？", purpose:"保存", format:"問いかけ投稿", detail:"感情が動いた瞬間に申込み口がない（DMのみ・フォームが遠い）と熱は冷める。即申込みできる動線の重要性を伝える。" },
+      { hook:"LINE登録のお礼メッセージ、\n何が書いてありますか？", purpose:"保存", format:"問いかけ投稿", detail:"登録直後のあいさつメッセージは開封率がほぼ100%の一等地。特典の渡し方と次の一歩の案内を設計する方法を紹介。" },
+      { hook:"あなたのページ、お客様は\n「スマホで・夜に・疲れた状態で」\n見ています。その想定、できてますか？", purpose:"保存", format:"問いかけ投稿", detail:"PCの大画面で作って満足しがち。寝る前のスマホで読みやすい文字サイズ・行間・ボタンの大きさになっているか確認を促す。" },
+      { hook:"申込みボタンの先、\n自分で押して試したことありますか？", purpose:"保存", format:"問いかけ投稿", detail:"フォームが開かない・LINEに飛ばない等のトラブルは自分では気づけない。月1回の動作チェックを習慣にする提案。" },
+    ],
+  },
+  "考え方の転換": {
+    "共感・寄り添い": [
+      { hook:"「もっと学ばなきゃ」と講座を増やす前に。\n足りないのは知識じゃなくて、\n導線かもしれません。", purpose:"シェア", format:"気づき投稿", detail:"学び続けても売上が変わらない人へ。インプットより、すでに持っている価値を「届く形」にする方が先だと気づかせる。" },
+      { hook:"「値下げすれば売れるかな」\nその前に、できることがあります。", purpose:"シェア", format:"気づき投稿", detail:"価格を下げる前に、価値の伝え方を変える。同じサービスでも伝え方次第で「安い」と感じてもらえることを伝えて値下げ思考を止める。" },
+      { hook:"「資格を取れば自信がつく」\n…つきませんでした。（私調べ）", purpose:"シェア", format:"気づき投稿", detail:"資格を増やしても不安は消えない。自信は「伝わった瞬間」「選ばれた瞬間」に生まれる。資格より伝え方、という気づきをシェア。" },
+      { hook:"SNSが苦手なんじゃなくて、\n「成果が見えない作業」が苦手なだけかも。", purpose:"シェア", format:"気づき投稿", detail:"発信嫌いの正体は、頑張りが数字につながらない徒労感。導線が整って成果が見え始めると発信は楽しくなることを伝える。" },
+      { hook:"頑張ってるのに売れないときは、\n「頑張る場所」がズレてることが多い。", purpose:"シェア", format:"気づき投稿", detail:"努力量ではなく配分の問題。投稿9割・導線1割になっていないか。配分を5:5に変えるだけで結果が変わることを伝える。" },
+      { hook:"完璧なプロフィール、完璧な投稿、\n完璧な世界観。\n…完璧を待ってたら、始まらない。", purpose:"シェア", format:"気づき投稿", detail:"完璧主義が機会損失になっている。70点で出して、お客様の反応で磨く方が早く良いものになる考え方を伝える。" },
+    ],
+    "学び・Tips": [
+      { hook:"集客は「狩り」じゃなくて「農業」です。\n種まきと、畑。両方必要。", purpose:"シェア", format:"気づき投稿", detail:"投稿は種まき、導線は畑。畑がないまま種をまいても育たない。例え話で導線の必要性を直感的に伝える。" },
+      { hook:"お客様は「認知→興味→信頼→行動」の\n階段を登ります。\nあなたの発信、どの段の人向けですか？", purpose:"保存", format:"Tips投稿", detail:"全投稿が認知向け（あるある系）だと信頼が育たない。階段ごとに必要な発信の種類を整理して伝える。" },
+      { hook:"売り込みが苦手な人ほど、\n導線が必要です。", purpose:"シェア", format:"気づき投稿", detail:"導線とページが「営業」を代わりにやってくれる。苦手な売り込みをしなくていい仕組みこそ、営業嫌いの味方だと伝える。" },
+      { hook:"単価を上げたいなら、\nデザインより先に「選ばれる理由」の言語化。", purpose:"シェア", format:"気づき投稿", detail:"高くても選ばれる人は理由が言語化されている。自分の強み・お客様の変化を言葉にすることが値上げの土台だと伝える。" },
+      { hook:"新規より、今いるフォロワーさん。\n100人いたら、その中に\nお客様はもういます。", purpose:"シェア", format:"気づき投稿", detail:"新規獲得に走る前に、既存フォロワーに価値が伝わっているか。今いる人に向けた発信と導線整備の方が早いことを伝える。" },
+      { hook:"「何を売るか」より\n「誰のどんな悩みを解決するか」。\nこれが決まると、発信はラクになる。", purpose:"シェア", format:"気づき投稿", detail:"商品起点ではなく悩み起点で考えると、投稿ネタもコピーも自然に決まる。発信に迷う根本原因を解決する視点を渡す。" },
+    ],
+    "背中を押す": [
+      { hook:"遠回りに見えても、\n導線づくりが一番の近道でした。", purpose:"フォロー獲得", format:"気づき投稿", detail:"投稿を量産するより、止まって仕組みを整えた方が結果的に早い。自身の経験として語り、今整えている人を肯定する。" },
+      { hook:"才能でもセンスでもなく、「順番」です。\nうまくいってる人は、順番が正しいだけ。", purpose:"フォロー獲得", format:"気づき投稿", detail:"受け皿→発信→改善の順番を守れば誰でも積み上がる。才能のせいにして諦めかけている人を引き戻す投稿。" },
+      { hook:"苦手な営業、しなくていいんです。\nページに、代わりに喋ってもらいましょう。", purpose:"フォロー獲得", format:"気づき投稿", detail:"対面営業やDM営業が苦手でも、伝わるページがあれば24時間営業してくれる。内向的な人ほど導線が武器になると伝える。" },
+      { hook:"「私なんて」と思ってるそのサービス、\n誰かにとっては「探してたもの」です。", purpose:"フォロー獲得", format:"気づき投稿", detail:"自己評価の低さで発信が弱気になっている人へ。問題は価値の有無ではなく届け方だけ。堂々と見せていい理由を伝える。" },
+      { hook:"止まってた時間は、無駄じゃない。\n「整える時間だった」と、あとで分かります。", purpose:"フォロー獲得", format:"気づき投稿", detail:"発信停止・停滞期に罪悪感を持つ人へ。止まった経験があるからこそ仕組みの大切さに気づける。自身の2ヶ月停止経験と重ねて語る。" },
+    ],
+    "問いかけ": [
+      { hook:"今の発信、1年後のあなたの売上に\nつながってますか？", purpose:"シェア", format:"問いかけ投稿", detail:"目先のいいねではなく資産になる発信をしているか問いかける。プロフィールに人を運ぶ投稿・信頼を積む投稿の割合を見直すきっかけに。" },
+      { hook:"「忙しいのに売上が増えない」\nその忙しさ、どこに向かってますか？", purpose:"シェア", format:"問いかけ投稿", detail:"作業量と成果が比例していない人へ。投稿・交流・学びのうち、申込みに直結する作業がどれだけあるか棚卸しを促す。" },
+      { hook:"あなたのサービスの価値、\n「お客様の言葉」で説明できますか？", purpose:"シェア", format:"問いかけ投稿", detail:"専門用語ではなくお客様が普段使う言葉で語れるか。お客様の声・質問の中から言葉を拾う方法を紹介する。" },
+      { hook:"フォロワーが1000人になったら、\n何が変わると思いますか？\n…具体的に。", purpose:"シェア", format:"問いかけ投稿", detail:"数字の目標が手段の目的化になっていないか問う。1000人いても導線がなければ今と同じ。先に変えるべきものに気づかせる。" },
+      { hook:"その悩み、「集客の悩み」ですか？\nそれとも「投稿の悩み」に\nすり替わってませんか？", purpose:"シェア", format:"問いかけ投稿", detail:"本来の目的（お客様を増やす）が、いつの間にか投稿のクオリティやネタの悩みに置き換わっている人へ。目的に立ち返る問いかけ。" },
+    ],
+  },
+  "制作の裏側": {
+    "共感・寄り添い": [
+      { hook:"「デザインセンスがなくて…」と\nよく言われます。\n大丈夫。センスより「型」です。", purpose:"信頼構築", format:"制作裏側投稿", detail:"デザインは才能ではなく再現可能な型（構成・余白・色数）があることを伝える。センスがないと諦めている人を安心させつつ専門性を見せる。" },
+      { hook:"ヒアリングで一番盛り上がるのは、\nデザインの話じゃなくて\n「お客様の話」です。", purpose:"信頼構築", format:"制作裏側投稿", detail:"良いページはお客様理解から生まれる。ヒアリングで何を聞くのかを少し見せて、設計重視の制作スタイルを伝える。" },
+      { hook:"「こんな初歩的なこと聞いていいのかな」\nって遠慮される方、多いです。\n初歩的な質問、大歓迎です。", purpose:"信頼構築", format:"制作裏側投稿", detail:"相談のハードルを下げる投稿。むしろ初歩的な疑問にこそ導線改善のヒントが詰まっている、という姿勢を見せる。" },
+      { hook:"納品して終わり、が苦手です。\n使われてこそのページなので。", purpose:"信頼構築", format:"制作裏側投稿", detail:"納品後サポートを大切にしている姿勢を伝える。作って渡すだけでなく、運用まで見届けたい想いを語って安心感を作る。" },
+      { hook:"実は、配色より\n「文字の大きさと余白」の方が、\n印象を決めています。", purpose:"信頼構築", format:"制作裏側投稿", detail:"プロの視点を少し公開する投稿。おしゃれに見えない原因の多くは色ではなく詰め込みすぎ。今日から使える気づきで信頼を得る。" },
+      { hook:"「おしゃれにしてください」と言われたら、\nまず「誰に届けたいか」を聞きます。", purpose:"信頼構築", format:"制作裏側投稿", detail:"おしゃれの基準はお客様の中にある。20代向けと50代向けでは正解が違う。ターゲットから逆算するデザイン哲学を見せる。" },
+    ],
+    "学び・Tips": [
+      { hook:"LPの色は「3色まで」。\nアクセントカラーは、\n押してほしいボタンだけに。", purpose:"保存", format:"Tips投稿", detail:"メイン・サブ・アクセントの3色構成。アクセントをボタン専用にすると視線が誘導される。Canvaでもすぐ使える配色ルールを紹介。" },
+      { hook:"文字を読ませたいなら、\n1行は20文字前後で。", purpose:"保存", format:"Tips投稿", detail:"スマホでの折り返しが美しいと読了率が上がる。改行位置を意識するだけでプロっぽくなる、すぐ使えるテクニック。" },
+      { hook:"写真選びのコツ：\n商品写真より「使った後の笑顔」。", purpose:"保存", format:"Tips投稿", detail:"人は商品ではなく未来を買う。料理教室なら完成品より「焼き上がりを見て笑う生徒さん」。ベネフィットが伝わる写真の選び方。" },
+      { hook:"余白は「空き」じゃなくて「デザイン」です。", purpose:"保存", format:"Tips投稿", detail:"詰め込むほど読まれなくなる理由を解説。余白が生む「高級感」「読みやすさ」をビフォーアフターのイメージで伝える。" },
+      { hook:"フォントを変えるだけで「高見え」します。\n教室・サロン系なら明朝体が効く理由。", purpose:"保存", format:"Tips投稿", detail:"ゴシック体と明朝体の印象の違いを解説。丁寧さ・上質さを伝えたい業種に明朝体が合う理由と、Canvaでのおすすめフォントを紹介。" },
+      { hook:"ボタンの文言、A/Bテストした結果\n一番押されたのは「意外なやつ」でした。", purpose:"保存", format:"Tips投稿", detail:"企業時代の経験から、ボタン文言で反応が変わる実例を紹介。「申し込む」vs「話を聞いてみる」など心理ハードルの違いを解説。" },
+      { hook:"プロのデザイナーも、実は\n「真っ白な状態」からは作りません。", purpose:"信頼構築", format:"制作裏側投稿", detail:"参考収集→構成→ラフ→デザインの順で作るプロの工程を公開。ゼロから作れないのは当たり前で、型と手順があることを伝えて安心させる。" },
+    ],
+    "背中を押す": [
+      { hook:"デザインの勉強、しなくていいんです。\nそれは私たちの仕事。\nあなたはサービスに集中してください。", purpose:"信頼構築", format:"制作裏側投稿", detail:"全部自分でやろうとして疲れている人へ。餅は餅屋という役割分担を提案し、外注やテンプレ活用を肯定する。" },
+      { hook:"「Canvaすら難しい」って方こそ、\nテンプレが効きます。", purpose:"信頼構築", format:"制作裏側投稿", detail:"穴埋め式ならデザイン知識ゼロでも形になる。テンプレは手抜きではなく時短の正解だと伝えて、テンプレ商品への導線を作る。" },
+      { hook:"想いが強い人ほど、\nページに詰め込みすぎます。\n削るのは、私に任せてください。", purpose:"信頼構築", format:"制作裏側投稿", detail:"伝えたいことが多すぎて1ページに全部入れてしまうあるある。「削る」のはプロの仕事。想いの強さを肯定しながら整理を申し出る。" },
+      { hook:"言葉にできない「なんとなくのイメージ」、\nそれで十分です。", purpose:"信頼構築", format:"制作裏側投稿", detail:"要望をうまく伝えられないから依頼できない、という遠慮を外す。引き出すのがプロの仕事であり、ヒアリングで言語化を手伝うと伝える。" },
+    ],
+    "問いかけ": [
+      { hook:"そのページ、作ってから\n1年放置してませんか？", purpose:"信頼構築", format:"問いかけ投稿", detail:"サービスが成長しているならページも更新が必要。価格・メニュー・お客様の声が最新かチェックを促す。" },
+      { hook:"あなたのページ、お客様に\nどんな「気持ち」になってほしいですか？", purpose:"信頼構築", format:"問いかけ投稿", detail:"安心？ワクワク？凛とした感じ？目指す感情が決まれば配色もフォントも決まる。感情から逆算するデザインの考え方を見せる。" },
+      { hook:"「自分で作る」と「頼む」、\n時給で計算したことありますか？", purpose:"信頼構築", format:"問いかけ投稿", detail:"慣れない作業に20時間かけるなら、その時間を本業に使った方が売上になることも。外注判断の基準を冷静に提示する。" },
+      { hook:"参考に保存したあの素敵なページ、\n「なぜ良いと感じたか」\n言葉にできますか？", purpose:"信頼構築", format:"問いかけ投稿", detail:"良いと感じる理由（余白・色数・写真・言葉）を分解できると、自分のページにも活かせる。プロの見方を少し共有する投稿。" },
+    ],
+  },
+};
+
+Object.keys(EXTRA_IDEAS).forEach(function(cat) {
+  Object.keys(EXTRA_IDEAS[cat]).forEach(function(tone) {
+    if (IDEAS[cat] && IDEAS[cat][tone]) {
+      EXTRA_IDEAS[cat][tone].forEach(function(idea) {
+        IDEAS[cat][tone].push(idea);
+      });
+    }
+  });
+});
+
+let selectedCat = null;
+let selectedTone = null;
+let lastIndices = {};
+
+function selectCat(el) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCat = el.dataset.cat;
+  updateBtn();
+}
+
+function selectTone(el) {
+  document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedTone = el.dataset.tone;
+  updateBtn();
+}
+
+function updateBtn() {
+  document.getElementById('generateBtn').disabled = !(selectedCat && selectedTone);
+}
+
+function generateIdeas() {
+  if (!selectedCat || !selectedTone) return;
+
+  const pool = (IDEAS[selectedCat] && IDEAS[selectedCat][selectedTone]) || [];
+  if (pool.length === 0) return;
+
+  const key = selectedCat + selectedTone;
+  let available = pool.map((_, i) => i);
+  if (lastIndices[key] && available.length > 5) {
+    const prev = lastIndices[key];
+    const fresh = available.filter(i => !prev.includes(i));
+    if (fresh.length >= 3) available = fresh.concat(prev);
+  }
+
+  for (let i = available.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [available[i], available[j]] = [available[j], available[i]];
+  }
+
+  const count = Math.min(5, pool.length);
+  const picked = available.slice(0, count);
+  lastIndices[key] = picked;
+  const ideas = picked.map(i => pool[i]);
+
+  renderIdeas(ideas);
+}
+
+function renderIdeas(ideas) {
+  const list = document.getElementById('ideaList');
+  list.innerHTML = '';
+
+  document.getElementById('resultsTitle').textContent =
+    '「' + selectedCat + '」×「' + selectedTone + '」のネタ ' + ideas.length + '件';
+
+  ideas.forEach(function(idea, i) {
+    const hookSafe = idea.hook.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const detailSafe = idea.detail.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+    const card = document.createElement('div');
+    card.className = 'idea-card';
+    card.innerHTML =
+      '<div class="idea-top">' +
+        '<div class="idea-num">' + (i+1) + '</div>' +
+        '<div class="idea-hook">' + hookSafe.replace(/\n/g,'<br>') + '</div>' +
+      '</div>' +
+      '<div class="idea-body">' +
+        '<div class="idea-meta">' +
+          '<span class="idea-tag tag-purpose">目的：' + idea.purpose + '</span>' +
+          '<span class="idea-tag tag-format">' + idea.format + '</span>' +
+        '</div>' +
+        '<p class="idea-detail">' + detailSafe + '</p>' +
+      '</div>' +
+      '<div class="idea-actions">' +
+        '<button class="btn-copy">📋 書き出しをコピー</button>' +
+      '</div>';
+
+    card.querySelector('.btn-copy').addEventListener('click', function() {
+      copyText(this, idea.hook);
+    });
+
+    list.appendChild(card);
+  });
+
+  const results = document.getElementById('results');
+  results.style.display = 'block';
+  results.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function copyText(btn, text) {
+  function onSuccess() {
+    btn.textContent = '✓ コピーしました';
+    btn.classList.add('copied');
+    setTimeout(function() {
+      btn.textContent = '📋 書き出しをコピー';
+      btn.classList.remove('copied');
+    }, 2000);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(onSuccess).catch(function() {
+      fallbackCopy(text); onSuccess();
+    });
+  } else {
+    fallbackCopy(text); onSuccess();
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+}
+</script>
+</body>
+</html>
